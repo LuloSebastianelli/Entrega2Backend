@@ -64,10 +64,4 @@ router.post("/register", async (req, res) => {
     res.redirect("/user/login");
   });
 
-
-router.post("/logout", (req, res) => {
-    res.clearCookie("token");
-    res.status(200).json({ message: "Sesion cerrada exitosamente" });
-  });
-
 export default router;

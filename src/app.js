@@ -4,6 +4,8 @@ import { __dirname } from './utils.js';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import handlebars from 'express-handlebars';
+import passport from 'passport';
+import initializePassport from './config/passport.config.js';
 
 import viewRouter from './routes/view.router.js';
 import userRouter from './routes/user.router.js';
@@ -18,6 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(config.FIRMA_COOKIE));
 app.use(express.static(__dirname + '/public'));
 
+initializePassport();
+app.use(passport.initialize());
 
 app.use('/user', viewRouter);
 app.use('/api/user', userRouter);

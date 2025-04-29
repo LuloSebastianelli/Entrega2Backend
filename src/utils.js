@@ -23,6 +23,22 @@ export const authToken = (req, res, next) => {
     })
 }
 
+export const passportCall = (strategy) => {
+    return async (req, res, next) => {
+      passport.authenticate(strategy, function (err, user, info) {
+        if (err) return next(err);
+        if (!user) {
+          res
+            .status(401)
+            .send({ error: info.messages ? info.messages : info.toString() });
+          return;
+        }
+        req.user = user;
+        next();
+      })(req, res, next);
+    };
+  };
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
