@@ -1,51 +1,73 @@
 import { Router } from "express";
-import UserService from "../models/user.model.js";
+import userService from "../models/user.model.js";
 import { isValidPassword, generateToken } from "../utils.js";
 
 const router = Router();
 
-router.post('/register', async (req, res) => {
-    try {
-        const {first_name, last_name, email, age, password} = req.body;
-        if (!first_name || !last_name || !email || !age || !password) {
-            return res.status(400).json({error: 'Todos los campos son obligatorios'});
-        }
-
-        const newUser = new UserService({first_name, last_name, email, age, password});
-
-        await newUser.save();
-
-        res.status(201).json({message: 'Usuario creado'});
-    } catch (error) {
-        res.status(400).json({error: error.message});
+router.post("/register", async (req, res) => {
+    const { first_name, last_name, email, age, password } = req.body;
+    if (!first_name || !last_name || !email || !age || !password) {
+      return res.status(400).json({
+        message: "Todos los campos son requeridos",
+      });
     }
-});
-
-router.post('/login', async (req, res) => {
     try {
-        const {email, password} = req.body;
-        if (!email || !password) {
-            return res.status(400).json({error: 'Todos los campos son obligatorios'});
-        }
-
-        const user = await UserService.findOne({email});
-        if (!user) {
-            return res.status(404).json({error: 'Usuario no encontrado'});
-        }
-
-        if(!isValidPassword(user, password)) {
-            return res.status(401).json({error: 'Contraseña incorrecta'});
-        }
-
-        const jwt_token = generateToken({userId: user._id, role: user.role, name: user.first_name});
-        res.cookie('currentUser', jwt_token, {httpOnly: true});
-
-        res.json({message: 'Inicio de sesión exitoso'});
-
+      const newUser = new userService({
+        first_name,
+        last_name,
+        email,
+        age,
+        password,
+      });
+      await newUser.save();
+      res.status(201).send({
+        status: true,
+        message: "Usuario registrado exitosamente",
+      });
+      res.redirect("/user/current");
     } catch (error) {
-        res.status(500).json({error: error.message});
+      res.status(400).json({ error: error.message });
     }
-    
-})
+  });
+
+  router.post("/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({
+          message: "Todos los campos son requeridos",
+        });
+      }
+      const user = await userService.findOne({ email });
+      if (!user) {
+        return res.status(401).send("Usuario no encontrado");
+      }
+      if (!isValidPassword(user, password)) {
+        return res.status(403).send("Contraseña incorrecta");
+      }
+      const jwt_token = generateToken({
+        userId: user._id,
+        role: user.role,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      });
+      res.cookie("currentUser", jwt_token, { httpOnly: true });
+      res.redirect("/user/current");
+    } catch (error) {
+      console.log(`Error al iniciar sesión ${error}`);
+      res.status(400).send("Error al iniciar sesión");
+    }
+  });
+  
+  router.post("/logout", (req, res) => {
+    res.clearCookie("currentUser", { httpOnly: true });
+    res.redirect("/user/login");
+  });
+
+
+router.post("/logout", (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({ message: "Sesion cerrada exitosamente" });
+  });
 
 export default router;

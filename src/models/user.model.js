@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     age: { type: Number, required: true },
     password: { type: String, required: true },
-    cart: { type: String, unique: true },
-    role: { type: String, required: true, default: 'user' }
+    cardId: { type: mongoose.Schema.Types.ObjectId, ref: "carts" },
+    role: { type: String, default: 'user' }
 });
 
 //middleware para hash password

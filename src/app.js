@@ -3,6 +3,13 @@ import config from './config/config.js';
 import { __dirname } from './utils.js';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
+import handlebars from 'express-handlebars';
+
+import viewRouter from './routes/view.router.js';
+import userRouter from './routes/user.router.js';
+
+const URL_MONGO = config.URL_MONGO;
+const PORT = config.PORT;
 
 //configuramos la app
 const app = express();
@@ -11,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(config.FIRMA_COOKIE));
 app.use(express.static(__dirname + '/public'));
 
-//importamos las rutas
+
 app.use('/user', viewRouter);
 app.use('/api/user', userRouter);
 

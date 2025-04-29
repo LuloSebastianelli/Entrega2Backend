@@ -8,7 +8,7 @@ const JWT_PRIVATE_KEY = config.JWT_PRIVATE_KEY;
 const JWT_EXPIRES_TIME_TOKEN = config.JWT_EXPIRES_TIME_TOKEN;
 
 export const generateToken = (user) => {
-    const token = JsonWebTokenError.sign(user, JWT_PRIVATE_KEY, {expiresIn: '24h'});
+    const token = jwt.sign(user, JWT_PRIVATE_KEY, {expiresIn: '24h'});
     return token;
 }
 
